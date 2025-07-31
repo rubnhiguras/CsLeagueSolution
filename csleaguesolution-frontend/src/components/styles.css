@@ -1,0 +1,122 @@
+/* styles.css */
+
+/* Estilos generales */
+body {
+  background-color: #282c34;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* Contenedor principal */
+.profile-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #3a4049;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Título */
+.profile-container h2 {
+  color: #61dafb;
+  border-bottom: 2px solid #61dafb;
+  padding-bottom: 10px;
+  margin-top: 0;
+}
+
+/* Información del usuario */
+.profile-info {
+  margin: 20px 0;
+}
+
+.profile-info p {
+  margin: 15px 0;
+  font-size: 16px;
+}
+
+.profile-info strong {
+  color: #61dafb;
+  margin-right: 10px;
+}
+
+/* Botón de logout */
+.logout-button {
+  background-color: #61dafb;
+  color: #282c34;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.logout-button:hover {
+  background-color: #4fa8d3;
+}
+
+/* Efectos de transición */
+.profile-info p {
+  transition: transform 0.2s ease;
+}
+
+.profile-info p:hover {
+  transform: translateX(5px);
+}
+
+/* Añade esto al final de tu styles.css */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group {
+  margin: 15px 0;
+}
+
+.input-group label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.login-input {
+  padding: 10px;
+  background-color: #282c34;
+  border: 1px solid #61dafb;
+  border-radius: 4px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #4fa8d3;
+  box-shadow: 0 0 0 2px rgba(79, 168, 211, 0.2);
+}
+
+.error-message {
+  color: #ff6b6b;
+  text-align: center;
+  margin-top: 15px;
+  padding: 8px;
+  background-color: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 15px;
+    margin: 20px;
+    width: auto;
+  }
+}
+

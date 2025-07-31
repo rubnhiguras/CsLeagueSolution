@@ -1,0 +1,207 @@
+/* Estilos generales */
+.tree-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: #3a4049;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    color: #e0e4eb;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Encabezado del usuario */
+.user-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #4a4f5a;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    border: 3px solid #61dafb;
+}
+
+.user-info h2 {
+    color: #61dafb;
+    margin: 0 0 5px 0;
+    font-size: 24px;
+}
+
+.user-email {
+    color: #a0a4ac;
+    margin: 5px 0;
+}
+
+.user-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 5px 0 0 0;
+}
+
+.user-phone {
+    color: #c0c4cc;
+}
+
+.status-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.active {
+    background-color: rgba(46, 125, 50, 0.2);
+    color: #66bb6a;
+}
+
+.disabled {
+    background-color: rgba(198, 40, 40, 0.2);
+    color: #ef5350;
+}
+
+/* Estructura de árbol */
+.tree-title {
+    color: #61dafb;
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #61dafb;
+}
+
+.tree-root, .tree-branch {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.tree-root {
+    padding-left: 0;
+}
+
+.tree-branch {
+    padding-left: 30px;
+    margin-top: 10px;
+    border-left: 2px dashed #4a4f5a;
+}
+
+.tree-node {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.tree-node-header {
+    display: flex;
+    align-items: flex-start;
+    background-color: #2c313a;
+    border-radius: 6px;
+    padding: 12px 15px;
+    transition: all 0.2s ease;
+}
+
+.tree-node-header:hover {
+    background-color: #343a44;
+    transform: translateX(3px);
+}
+
+.node-icon {
+    font-size: 20px;
+    margin-right: 12px;
+    margin-top: 2px;
+}
+
+.node-content {
+    flex: 1;
+}
+
+.tree-node h4, .tree-node h5 {
+    margin: 0 0 5px 0;
+    color: #61dafb;
+}
+
+.tree-node h5 {
+    color: #a0d8f7;
+}
+
+.node-description {
+    color: #b0b4bc;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.node-context {
+    color: #8a8f98;
+    font-size: 12px;
+    margin: 5px 0 0 0; 
+}
+
+/* Nodos específicos */
+.role-node {
+    border-left: 3px solid #61dafb;
+}
+
+.permission-node {
+    border-left: 3px solid #4caf50;
+}
+
+/* Estado vacío */
+.no-roles {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 6px;
+    text-align: center;
+    color: #a0a4ac;
+    font-style: italic;
+}
+
+.no-roles i {
+    margin-right: 8px;
+    color: #61dafb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .user-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .tree-branch {
+        padding-left: 20px;
+    }
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: #2c313a !important;
+    color: #e0e4eb !important;
+    max-width: 250px;
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+    border: 1px solid #4a4f5a !important;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2) !important;
+    opacity: 1 !important;
+    z-index: 1000 !important;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
