@@ -29,4 +29,15 @@ public class UserController {
         }
 
     }
+
+    @GetMapping("/showCompetitions")
+    public ResponseEntity<DTO.UserResponse> getCompetitions() {
+        try{
+            return ResponseEntity.ok(userService.getCurrentUser());
+        } catch (Exception exception){
+            logger.error(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
 }

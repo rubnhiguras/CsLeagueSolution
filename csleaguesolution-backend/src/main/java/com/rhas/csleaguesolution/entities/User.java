@@ -27,7 +27,6 @@ public class User {
     private String passwordHash;
     private String avatarUrl;
     private boolean disabled;
-    // relaciones con roles y permisos
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

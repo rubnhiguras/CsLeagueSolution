@@ -23,7 +23,6 @@ public class Team {
     private User capitan;
     private String avatarUrl;
     private boolean disabled;
-    // relaciones con roles y permisos
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

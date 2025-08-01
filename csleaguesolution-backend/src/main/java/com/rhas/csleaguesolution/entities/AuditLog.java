@@ -21,9 +21,13 @@ public class AuditLog {
 
     private LocalDateTime timestamp = LocalDateTime.now();
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "users_id", referencedColumnName = "id")
+    private User editedBy;
 
     private UUID sessionId;
+
+    private String token;
 
     private String actionType; // LOGIN, UPDATE, etc.
 
@@ -39,8 +43,4 @@ public class AuditLog {
     @Column(columnDefinition = "TEXT")
     private String newValue;
 
-    private String ipAddress;
-
-    @Column(columnDefinition = "TEXT")
-    private String userAgent;
 }
