@@ -39,6 +39,11 @@
     margin: 5px 0;
 }
 
+.user-description {
+    color: #a0a4ac;
+    margin: 5px 0;
+}
+
 .user-meta {
     display: flex;
     align-items: center;
@@ -205,3 +210,22 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+.tree-add-bar {
+    padding: 4px 12px;
+    margin-top: 4px;
+    margin-left: 24px;
+    cursor: pointer;
+    font-style: italic;
+    color: #61dafb;
+    border-left: 2px solid #61dafb;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s, color 0.2s;
+    border-radius: 4px;
+}
+
+.tree-add-bar:hover {
+    background-color: rgba(97, 218, 251, 0.1);
+    color: #a0d8f7;
+}
+

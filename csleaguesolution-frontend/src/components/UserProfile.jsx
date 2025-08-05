@@ -4,7 +4,8 @@ import './styles.css';
 import { UserRolesPermissions } from './UserRolesPermissions'; 
 import './UserRolesPermissions.css';
 import axios from 'axios';
-import { FiLogOut, FiHome, FiActivity, FiUser, FiUsers, FiCalendar, FiFileText, FiRefreshCw  } from "react-icons/fi";
+import { FiLogOut, FiHome, FiUser, FiUsers, FiCalendar, FiRefreshCw } from "react-icons/fi";
+import { FaTrophy, FaUsers, FaNewspaper, FaHandshake } from "react-icons/fa";
 
 export const UserProfile = ({ onLogout }) => {
   const [user, setUser] = useState(null);
@@ -53,6 +54,10 @@ export const UserProfile = ({ onLogout }) => {
             <FiHome size={20} /> 
             <span className="tooltiptext">Feed</span>
           </button>
+          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Noticias')}>
+            <FaNewspaper size={20} /> 
+            <span className="tooltiptext">Noticias</span>
+          </button>
           <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Perfil')}>
             <FiUser size={20} /> 
             <span className="tooltiptext">Perfil</span>
@@ -61,9 +66,21 @@ export const UserProfile = ({ onLogout }) => {
             <FiCalendar size={20} /> 
             <span className="tooltiptext">Partidos</span>
           </button>
-          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Equipo')}>
+          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Equipos')}>
+            <FaUsers size={20} /> 
+            <span className="tooltiptext">Equipos</span>
+          </button>
+          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Competiciones')}>
+            <FaTrophy size={20} /> 
+            <span className="tooltiptext">Competiciones</span>
+          </button>
+          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Usuarios')}>
             <FiUsers size={20} /> 
-            <span className="tooltiptext">Equipo</span>
+            <span className="tooltiptext">Usuarios</span>
+          </button>
+          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Patrocinadores')}>
+            <FaHandshake size={20} /> 
+            <span className="tooltiptext">Patrocinadores</span>
           </button>
           <span/>
           <button className="sidebar-button tooltip" onClick={onRefresh}>

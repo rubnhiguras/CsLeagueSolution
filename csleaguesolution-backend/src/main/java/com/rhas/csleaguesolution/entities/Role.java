@@ -41,4 +41,11 @@ public class Role {
         }
         return this.permisos.add(newPermission);
     }
+
+    public boolean removePermisos(Permission removePermission){
+        if (this.permisos == null){
+            this.permisos = new HashSet<>();
+        }
+        return this.permisos.remove(removePermission);
+    }
 }

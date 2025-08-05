@@ -1,21 +1,34 @@
 package com.rhas.csleaguesolution.service;
 
 import com.rhas.csleaguesolution.dto.DTO;
+import com.rhas.csleaguesolution.entities.Context;
+import com.rhas.csleaguesolution.entities.Permission;
+import com.rhas.csleaguesolution.entities.Role;
 import com.rhas.csleaguesolution.entities.User;
+import com.rhas.csleaguesolution.repositories.ContextRepository;
+import com.rhas.csleaguesolution.repositories.PermissionRepository;
+import com.rhas.csleaguesolution.repositories.RoleRepository;
 import com.rhas.csleaguesolution.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ContextRepository contextRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
 
     /**
      * Get currently authenticated user
@@ -54,6 +67,110 @@ public class UserService {
 
         User updatedUser = userRepository.save(user);
         return mapUserToUserResponse(updatedUser);
+    }
+
+    @Transactional
+    public void saveUserPermissionsTree(Long userId, DTO.UserPermissionsTreeDTO request) {
+        // 1. Obtener usuario
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // === RECOGER IDS DE LA REQUEST ===
+        Set<Long> requestContextIds = request.contexts().stream()
+                .map(DTO.UserPermissionsTreeDTO.ContextDTO::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Set<Long> requestRoleIds = request.contexts().stream()
+                .flatMap(ctx -> ctx.roles().stream())
+                .map(DTO.UserPermissionsTreeDTO.RoleDTO::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Set<Long> requestPermissionIds = request.contexts().stream()
+                .flatMap(ctx -> ctx.roles().stream())
+                .flatMap(role -> role.permissions().stream())
+                .map(DTO.UserPermissionsTreeDTO.PermissionDTO::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // === ELIMINAR RELACIONES NO PRESENTES EN LA REQUEST ===
+        // Eliminar roles del usuario que no están en request
+        Set<Role> rolesToRemove = user.getRoles().stream()
+                .filter(role -> !requestRoleIds.contains(role.getId()))
+                .collect(Collectors.toSet());
+        rolesToRemove.forEach(user::removeRol);
+
+        // Eliminar permisos de cada rol que no están en request
+        for (Role role : roleRepository.findAll()) {
+            if (requestRoleIds.contains(role.getId())) {
+                Set<Permission> permsToRemove = role.getPermisos().stream()
+                        .filter(p -> !requestPermissionIds.contains(p.getId()))
+                        .collect(Collectors.toSet());
+                permsToRemove.forEach(role::removePermisos);
+                roleRepository.save(role);
+            }
+        }
+
+// Opcional: Eliminar roles y contextos huérfanos si no están asignados a nadie
+        roleRepository.findAll().forEach(role -> {
+            if (!requestRoleIds.contains(role.getId())) {
+                roleRepository.delete(role);
+            }
+        });
+
+        contextRepository.findAll().forEach(context -> {
+            if (!requestContextIds.contains(context.getId())) {
+                contextRepository.delete(context);
+            }
+        });
+
+// === PROCESAR Y GUARDAR NUEVOS DATOS ===
+        for (DTO.UserPermissionsTreeDTO.ContextDTO ctxDto : request.contexts()) {
+            Context context = contextRepository.findById(
+                    ctxDto.id() != null ? ctxDto.id() : -1
+            ).orElse(
+                    contextRepository.findByName(ctxDto.name()).orElse(new Context())
+            );
+            context.setName(ctxDto.name());
+            context.setDescription(ctxDto.description());
+            context = contextRepository.save(context);
+
+            for (DTO.UserPermissionsTreeDTO.RoleDTO roleDto : ctxDto.roles()) {
+                Role role = roleRepository.findById(
+                        roleDto.id() != null ? roleDto.id() : -1
+                ).orElse(
+                        roleRepository.findByName(roleDto.name()).orElse(new Role())
+                );
+                role.setName(roleDto.name());
+                role.setDescription(roleDto.description());
+                role.setContext(context);
+
+                // Sincronizar permisos del rol
+                Set<Permission> updatedPerms = new HashSet<>();
+                for (DTO.UserPermissionsTreeDTO.PermissionDTO permDto : roleDto.permissions()) {
+                    Permission permission = permissionRepository.findById(
+                            permDto.id() != null ? permDto.id() : -1
+                    ).orElse(
+                            permissionRepository.findByName(permDto.name()).orElse(new Permission())
+                    );
+                    permission.setName(permDto.name());
+                    permission.setDescription(permDto.description());
+                    permission.setContext(context);
+                    permission = permissionRepository.save(permission);
+                    updatedPerms.add(permission);
+                }
+
+                role.setPermisos(updatedPerms);
+                role = roleRepository.save(role);
+
+                // Asignar rol al usuario si no lo tiene
+                user.addRol(role);
+            }
+        }
+
+        userRepository.save(user);
+
     }
 
     /**

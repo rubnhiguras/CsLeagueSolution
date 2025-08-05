@@ -42,4 +42,11 @@ public class User {
         }
         return this.roles.add(newRole);
     }
+
+    public boolean removeRol(Role removedRole){
+        if (this.roles == null){
+            this.roles = new HashSet<>();
+        }
+        return this.roles.remove(removedRole);
+    }
 }

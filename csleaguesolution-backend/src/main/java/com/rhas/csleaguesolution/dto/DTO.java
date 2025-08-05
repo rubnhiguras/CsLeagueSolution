@@ -1,6 +1,7 @@
 package com.rhas.csleaguesolution.dto;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Set;
 
 public class DTO {
@@ -17,6 +18,46 @@ public class DTO {
     public record CompetitionsResponse(Long id, String name, String largename, String avatarUrl, boolean disabled, Timestamp iniDateTime, Timestamp endDateTime) {}
 
     public record ContextResponse(Long id, String name, String description) {}
+
+    public record CreatePermissionDTO(
+            String name,
+            String description,
+            Long contextId
+    ) {}
+
+    public record PermissionDTO(
+            Long id,
+            String name,
+            String description,
+            Long contextId,
+            String contextName
+    ) {}
+
+    public record UserPermissionsTreeDTO(
+            Long userId,
+            Collection<ContextDTO> contexts
+    ) {
+        public record ContextDTO(
+                Long id,
+                String name,
+                String description,
+                Collection<RoleDTO> roles
+        ) {}
+
+        public record RoleDTO(
+                Long id,
+                String name,
+                String description,
+                Collection<PermissionDTO> permissions
+        ) {}
+
+        public record PermissionDTO(
+                Long id,
+                String name,
+                String description
+        ) {}
+    }
+
 
     public static final String ROLE_REGISTERED_USER = "REGISTERED_USER";
     public static final String ROLE_ADMIN_USER = "ROLE_ADMIN";
