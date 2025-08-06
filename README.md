@@ -30,7 +30,7 @@
    cd Rhascsleaguesolution
 
 2. **Instalar WSL o Linux con Docker**:
-   Al instalar WSL o disponer de una máquina unix/linux, ejecutar los siguientes comandos:
+   Al instalar WSL o disponer de una máquina unix/linux, ejecutar los siguientes comandos o seguir la siguiente url https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04-es:
    ```sudo apt update && sudo apt upgrade -y
    sudo apt install -y docker.io 
    sudo usermod -aG docker $USER
