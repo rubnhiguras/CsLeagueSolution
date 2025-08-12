@@ -58,6 +58,7 @@ wsl
    sudo systemctl enable docker
    sudo apt-get update
    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+   sudo systemctl restart docker
    ```
 5. **Desplegar**:
     Para desplegar, ejecutar: 
