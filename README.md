@@ -52,7 +52,9 @@ wsl
    sudo apt install -y docker.io 
    sudo usermod -aG docker $USER
    sudo systemctl enable docker
-
+   sudo apt-get update
+   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+   ```
 5. **Desplegar**:
     ```
        .\boot-dev.sh
