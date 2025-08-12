@@ -55,6 +55,13 @@ wsl
    sudo apt-get update
    sudo systemctl restart docker
    ```
+   reiniciar WSL : 
+   ```
+     exit
+     wsl --shutdown
+     wsl
+   ```
+
 5. **Desplegar**:
     Para desplegar, ejecutar: 
        .\boot-dev.sh
