@@ -27,8 +27,8 @@
 1. **Clonar el repositorio**:
    Descargar el fichero ZIP con el proyecto es otra opción. 
    ```sh
-   git clone https://github.com/rubnhiguras/Rhascsleaguesolution.git
-   cd Rhascsleaguesolution
+   git clone https://github.com/rubnhiguras/CsLeaguesolution.git
+   cd CsLeagueSolution
 
 3. **Instalar WSL o Linux con Docker**:
 
