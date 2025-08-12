@@ -1,9 +1,16 @@
 FROM node:18-alpine
 
 WORKDIR /app
-COPY package.json ./
-RUN npm install 
+
+# Copiar primero solo los archivos de dependencias
+COPY package.json package-lock.json* ./
+
+# Instalar dependencias (esta capa se cachea si no cambian las dependencias)
+RUN npm install
+
+# Copiar el resto de los archivos
 COPY . .
 
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+
+CMD ["npm", "start"]

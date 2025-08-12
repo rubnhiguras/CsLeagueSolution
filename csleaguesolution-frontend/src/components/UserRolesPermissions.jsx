@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import AvatarUploader from './AvatarUploader';
 import { FiChevronRight, FiChevronDown, FiSave, FiTrash2, FiPlus } from 'react-icons/fi';
 import './UserRolesPermissions.css';
 import './styles.css';
@@ -228,7 +229,7 @@ export const UserRolesPermissions = ({ user }) => {
 
             {/* Encabezado del usuario */}
             <div className="user-header">
-                <img src={user.avatarUrl} alt="Avatar" className="avatar" />
+                <AvatarUploader user={user} />
                 <div className="user-info">
                     <h2>{user.name} {user.surname}</h2>
                     <p className="user-email">{user.email}</p>
@@ -243,15 +244,15 @@ export const UserRolesPermissions = ({ user }) => {
                          {groupedByContext.map(({ context, roles }) => {
                             if (roles.length === 0) return null;
 
-                            const permisos = roles.flatMap(role => role.permisos || []).map(p => p.name);
+                            const permisos = roles.flatMap(role => role.permisos || []).map(p => p.description);
                             const permisosUnicos = [...new Set(permisos)];
-                            const roleNames = roles.map(role => role.name);
+                            const roleNames = roles.map(role => role.description);
 
                             return (
-                            `En el contexto "${context.name}", ${user.name} ${user.surname} tiene ` +
+                            `En el contexto "${context.description}", ${user.name} ${user.surname} tiene ` +
                             (roleNames.length === 1 ? `el rol "${roleNames[0]}"` : `los roles ${roleNames.map(r => `"${r}"`).join(', ')}`) +
                             (permisosUnicos.length > 0
-                                ? ` con los siguientes permisos para ${permisosUnicos.map(p => `"${p}"`).join(', ')}. `
+                                ? ` con los siguientes permisos: ${permisosUnicos.map(p => `"${p}"`).join(', ')}. `
                                 : ` sin permisos asignados. `)
                             );
                         }).filter(Boolean).join(' ')}

@@ -1,24 +1,19 @@
 import { useState, useEffect } from "react";
 import { FiArrowUp } from "react-icons/fi";
+import './styles.css';
 
 export default function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
 
-  // Detectar cuando hacer visible el botón
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setVisible(true);
-      } else {
-        setVisible(false);
-      }
+      setVisible(window.scrollY > 225);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Función para volver arriba
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -29,9 +24,8 @@ export default function ScrollToTopButton() {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-6 right-6 p-3 rounded-full bg-blue-600 text-white shadow-lg transition-opacity duration-300 hover:bg-blue-700 ${
-        visible ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
+      className={`scroll-to-top ${visible ? "visible" : ""}`}
+      aria-label="Volver arriba"
     >
       <FiArrowUp size={20} />
     </button>

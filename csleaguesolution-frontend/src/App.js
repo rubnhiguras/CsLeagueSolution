@@ -63,7 +63,6 @@ const App = () => {
             </>
           )}
         </div>)}
-        <ScrollToTopButton></ScrollToTopButton>
       </div>
     );
   }
@@ -71,6 +70,9 @@ const App = () => {
   return (
     <div className="p-4">
       <UserProfile onLogout={handleLogout} />
+      <div>
+        <ScrollToTopButton></ScrollToTopButton>
+      </div>
     </div>
   );
 };
