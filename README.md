@@ -1,4 +1,4 @@
-# Rhascsleaguesolution  
+# CSLeague Solution  
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)  
 [![GitHub Issues](https://img.shields.io/github/issues/rubnhiguras/Rhascsleaguesolution)](https://github.com/rubnhiguras/Rhascsleaguesolution/issues)  
