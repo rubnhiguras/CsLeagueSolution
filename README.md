@@ -4,7 +4,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/rubnhiguras/Rhascsleaguesolution)](https://github.com/rubnhiguras/Rhascsleaguesolution/issues)  
 [![GitHub Stars](https://img.shields.io/github/stars/rubnhiguras/Rhascsleaguesolution)](https://github.com/rubnhiguras/Rhascsleaguesolution/stargazers)  
 
-**Rhascsleaguesolution** es un sistema de gestión de usuarios diseñado para facilitar el registro, autenticación y administración de usuarios en aplicaciones web.  
+**CsLeagueSolution** es un sistema de gestión de usuarios diseñado para facilitar el registro, autenticación y administración de usuarios en aplicaciones web.  
 
 ## Características  
 
