@@ -23,6 +23,11 @@ clean_container react-pwa-container
 clean_container springboot-app
 clean_container postgres
 
+#Eliminando volumenes
+docker volume rm -f postgres_data || true
+docker volume rm -f user_avatars  || true 
+docker volume prune -f
+
 # Eliminar red si existe
 if docker network ls --format '{{.Name}}' | grep -q "^csleaguesolutionnetwork$"; then
   echo "🧹 Eliminando red: csleaguesolutionnetwork"
@@ -36,6 +41,7 @@ fi
 docker network create csleaguesolutionnetwork || true
 # Crear volumen para datos (ignorar si ya existe)
 docker volume inspect postgres_data >/dev/null 2>&1 || docker volume create postgres_data
+docker volume inspect user_avatars >/dev/null 2>&1 || docker volume create user_avatars
 
 echo "🔄 Iniciando contenedor PostgreSQL..."
 
@@ -43,7 +49,7 @@ docker run -d --name postgres --network csleaguesolutionnetwork \
   -e POSTGRES_USER=admin \
   -e POSTGRES_PASSWORD=admin123 \
   -e POSTGRES_DB=csleaguesolutiondb \
-  -v postgres_data:/var/lib/postgresql/csleaguesolutiondb/data \
+  -v postgres_data:/var/lib/postgresql/csleaguesolutiondb/dev/data \
   -p 5432:5432 \
   postgres:16
 
@@ -65,20 +71,22 @@ echo "🔄🚀 Lanzando backend..."
 cd ./csleaguesolution-backend
 # Ejecutar el contenedor de Spring Boot 
 docker build --no-cache -t usuariocsleaguesolution/csleaguesolution-backend:latest .
-docker run -d --name springboot-app --network csleaguesolutionnetwork \
+docker start springboot-app 2>/dev/null || docker run -d --name springboot-app --network csleaguesolutionnetwork \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/csleaguesolutiondb \
   -e SPRING_DATASOURCE_USERNAME=admin \
   -e SPRING_DATASOURCE_PASSWORD=admin123 \
   -e SPRING_PROFILES_ACTIVE=dev \
   -e JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n' | tr -d '+/' | head -c 64) \
   -e JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005" \
+  -e AVATAR_UPLOAD_DIR=/app/uploads/avatars \
   -p 5005:5005 \
+  -v user_avatars:/app/uploads/avatars \
   usuariocsleaguesolution/csleaguesolution-backend:latest
-
+cd ..
 echo "✅🚀 Backend levantado correctamente."
 echo "🔄🚀 Lanzando frontend..."
 # Ejecutar el contenedor de front-end
-cd ../csleaguesolution-frontend 
+cd ./csleaguesolution-frontend 
 rm -rf node_modules package-lock.json
 # 1. Limpiar cachés previas
 docker builder prune -f
@@ -97,7 +105,8 @@ docker run -d --name nginx-proxy \
   --network csleaguesolutionnetwork \
   -p 80:80 \
   -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+  -v user_avatars:/usr/share/nginx/html/avatars \
   nginx:latest
 echo "✅🚀 Todo levantado correctamente."
 
-echo "ℹ️  Accede a http://localhost/api/swagger-ui/index.html para ver el Swagger y a http://localhost/csleaguesolution para ver la GUI."
+echo "ℹ️ Accede a http://localhost para visualizar la APP. http://localhost/api/swagger-ui/index.html y explorar /api/v3/api-docs para visualizar la API"

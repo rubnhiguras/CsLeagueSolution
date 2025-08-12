@@ -79,10 +79,11 @@ public class AdminUserInitializer {
 
             User admin = User.builder()
                     .name("Administrador")
+                    .surname("Apellido administrador")
                     .phone("+1 (212) 555-1234")
                     .email(adminEmail)
                     .passwordHash(adminPassword)
-                    .avatarUrl("https://e7.pngegg.com/pngimages/713/136/png-clipart-computer-icons-system-administrator-id-computer-network-heroes.png")
+//                    .avatarUrl("https://e7.pngegg.com/pngimages/713/136/png-clipart-computer-icons-system-administrator-id-computer-network-heroes.png")
                     .disabled(false)
                     .build();
             admin.addRol(roleAdmin); // relación añadida

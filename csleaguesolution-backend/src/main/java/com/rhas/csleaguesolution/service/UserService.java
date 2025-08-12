@@ -9,17 +9,19 @@ import com.rhas.csleaguesolution.repositories.ContextRepository;
 import com.rhas.csleaguesolution.repositories.PermissionRepository;
 import com.rhas.csleaguesolution.repositories.RoleRepository;
 import com.rhas.csleaguesolution.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.OpenApiResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,45 @@ public class UserService {
     private final ContextRepository contextRepository;
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+
+    @Value("${app.avatar.upload-dir}")
+    private String avatarUploadDir;
+
+    public DTO.UserResponse updateUserAvatar(Long userId, MultipartFile file) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        // Validar el archivo
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("El archivo está vacío");
+        }
+
+        // Crear directorio si no existe
+        File uploadDir = new File(avatarUploadDir);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // Generar nombre único para el archivo
+        String originalFilename = file.getOriginalFilename();
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String newFilename = UUID.randomUUID().toString() + fileExtension;
+        String relativePath = "http://localhost/api/api/files/avatar/" + newFilename;
+        String absolutePath = avatarUploadDir + File.separator + newFilename;
+
+        // Guardar el archivo
+        try {
+            file.transferTo(new File(absolutePath));
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar el archivo", e);
+        }
+
+        // Actualizar la base de datos
+        user.setAvatarUrl(relativePath);
+        userRepository.save(user);
+
+        return mapUserToUserResponse(user);
+    }
 
     /**
      * Get currently authenticated user

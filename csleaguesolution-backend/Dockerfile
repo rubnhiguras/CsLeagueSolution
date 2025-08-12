@@ -2,7 +2,12 @@
 # Etapa 1: Compilar con Maven
 # =======================
 FROM maven:3.9-eclipse-temurin-17 AS build
+
+RUN mkdir -p /app/uploads/avatars
+RUN chmod -R 777 /app/uploads/avatars
+
 WORKDIR /app
+
 COPY . .
 RUN mvn clean package -DskipTests
 

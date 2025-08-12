@@ -8,11 +8,14 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 //import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 //import org.springframework.core.io.Resource;
 //import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 //import org.springframework.web.servlet.resource.*;
 //
 //import java.io.IOException;
@@ -20,6 +23,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SpringdocSwaggerFix implements WebMvcConfigurer {
+    @Value("${app.avatar.upload-dir}")
+    private String uploadDir;
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -39,6 +44,15 @@ public class SpringdocSwaggerFix implements WebMvcConfigurer {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")));
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/avatars/**")
+                .addResourceLocations("file:" + uploadDir + "/")
+                .setCachePeriod(3600)
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
     }
 
 //    @Override
