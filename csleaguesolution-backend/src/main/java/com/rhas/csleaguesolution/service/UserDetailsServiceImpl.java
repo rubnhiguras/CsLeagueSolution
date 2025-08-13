@@ -35,7 +35,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     user.getEmail(),
                     user.getPasswordHash(),
                     user.getRoles().stream()
-                            .map(role -> new SimpleGrantedAuthority(role.getName().toUpperCase()))
+                            .flatMap(role -> role.getPermisos().stream())
+                            .map(permiso -> new SimpleGrantedAuthority(permiso.getName().toUpperCase()))
                             .collect(Collectors.toSet())
             );
         } catch (DataAccessException e) {

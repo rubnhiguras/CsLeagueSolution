@@ -49,7 +49,7 @@ docker run -d --name postgres --network csleaguesolutionnetwork \
   -e POSTGRES_USER=admin \
   -e POSTGRES_PASSWORD=admin123 \
   -e POSTGRES_DB=csleaguesolutiondb \
-  -v postgres_data:/var/lib/postgresql/csleaguesolutiondb/dev/data \
+  -v postgres_data:/var/lib/postgresql/data \
   -p 5432:5432 \
   postgres:16
 
@@ -70,7 +70,7 @@ echo "🔄🚀 Lanzando backend..."
 
 cd ./csleaguesolution-backend
 # Ejecutar el contenedor de Spring Boot 
-docker build --no-cache -t usuariocsleaguesolution/csleaguesolution-backend:latest .
+docker build --no-cache -t csleaguesolution/csleaguesolution-backend:latest .
 docker start springboot-app 2>/dev/null || docker run -d --name springboot-app --network csleaguesolutionnetwork \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/csleaguesolutiondb \
   -e SPRING_DATASOURCE_USERNAME=admin \
@@ -81,7 +81,7 @@ docker start springboot-app 2>/dev/null || docker run -d --name springboot-app -
   -e AVATAR_UPLOAD_DIR=/app/uploads/avatars \
   -p 5005:5005 \
   -v user_avatars:/app/uploads/avatars \
-  usuariocsleaguesolution/csleaguesolution-backend:latest
+  csleaguesolution/csleaguesolution-backend:latest
 cd ..
 echo "✅🚀 Backend levantado correctamente."
 echo "🔄🚀 Lanzando frontend..."

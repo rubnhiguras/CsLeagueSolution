@@ -29,10 +29,10 @@ rm -rf node_modules package-lock.json
 docker builder prune -f
 
 # 2. Construir con BuildKit habilitado
-docker build --no-cache -t usariocsleaguesolution/react-pwa-app:latest .
+docker build --no-cache -t csleaguesolution/react-pwa-app:latest .
 
 # 3. Ejecutar el contenedor
-docker run -d --name react-pwa-container --network csleaguesolutionnetwork usariocsleaguesolution/react-pwa-app:latest
+docker run -d --name react-pwa-container --network csleaguesolutionnetwork csleaguesolution/react-pwa-app:latest
 
 echo "✅🚀 Frontend levantado correctamente."
 

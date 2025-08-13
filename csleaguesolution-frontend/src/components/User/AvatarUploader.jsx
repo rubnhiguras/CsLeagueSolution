@@ -103,7 +103,7 @@ const AvatarUploader = ({user}) => {
       });
       
       const fileName = user.avatarUrl.split('/').pop();
-      saveAs(response.data, fileName || 'avatar.png');
+      saveAs(response.data, 'avatar_user_'+ user.name + '_' + fileName +'.png');
     } catch (error) {
       console.error('Error downloading avatar:', error);
       setError('Error al descargar el avatar');

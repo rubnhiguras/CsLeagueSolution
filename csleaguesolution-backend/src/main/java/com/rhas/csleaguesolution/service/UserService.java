@@ -13,11 +13,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.MethodNotAllowedException;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,25 +88,41 @@ public class UserService {
      * Get all users (for admin purposes)
      */
     public List<DTO.UserResponse> getAllUsers() {
+        final boolean hasRequiredPermission = getCurrentUserPrincipal()
+                .getAuthorities().stream()
+                .anyMatch(grantedAuthority ->
+                        (DTO.PERMISSION_SHOW_USERS_ACCESS.equals(grantedAuthority.getAuthority()) ||
+                         DTO.PERMISSION_EDIT_USERS_ACCESS.equals(grantedAuthority.getAuthority()) ||
+                         DTO.PERMISSION_DISABLE_USERS_ACCESS.equals(grantedAuthority.getAuthority())
+                        )
+                );
+        if(!hasRequiredPermission){
+            throw new AccessDeniedException("Acceso a datos no permitidos");
+        }
         return userRepository.findAll().stream()
                 .map(this::mapUserToUserResponse)
                 .collect(Collectors.toList());
     }
 
-
+    public DTO.UserResponse updateCurrentUser(DTO.UserRequest userRequest) {
+        org.springframework.security.core.userdetails.User currentUser = getCurrentUserPrincipal();
+        return userRequest.email().equals(currentUser.getUsername()) ?
+            updateUser(userRequest) : null;
+    }
 
     /**
      * Update user profile
      */
-    public DTO.UserResponse updateUser(DTO.UserResponse userResponse) {
-        org.springframework.security.core.userdetails.User currentUser = getCurrentUserPrincipal();
-        User user = userRepository.findByEmail(currentUser.getUsername())
-                .orElseThrow(() -> new OpenApiResourceNotFoundException(currentUser.getUsername()));
+    public DTO.UserResponse updateUser(DTO.UserRequest userRequest) {
+        User user = userRepository.findByEmail(userRequest.email())
+                .orElseThrow(() -> new OpenApiResourceNotFoundException(userRequest.email()));
 
-        user.setName(userResponse.name());
-        user.setSurname(userResponse.surname());
-        user.setPhone(userResponse.phone());
-        user.setAvatarUrl(userResponse.avatarUrl());
+        user.setName(userRequest.name());
+        user.setSurname(userRequest.surname());
+        user.setPhone(userRequest.phone());
+        user.setInstagram(userRequest.instagram());
+        user.setAvatarUrl(userRequest.avatarUrl());
+        user.setDisabled(userRequest.disabled());
 
         User updatedUser = userRepository.save(user);
         return mapUserToUserResponse(updatedUser);
@@ -153,20 +171,20 @@ public class UserService {
             }
         }
 
-// Opcional: Eliminar roles y contextos huérfanos si no están asignados a nadie
-        roleRepository.findAll().forEach(role -> {
-            if (!requestRoleIds.contains(role.getId())) {
-                roleRepository.delete(role);
-            }
-        });
+        // Opcional: Eliminar roles y contextos huérfanos si no están asignados a nadie
+//        roleRepository.findAll().forEach(role -> {
+//            if (!requestRoleIds.contains(role.getId())) {
+//                roleRepository.delete(role);
+//            }
+//        });
+//
+//        contextRepository.findAll().forEach(context -> {
+//            if (!requestContextIds.contains(context.getId())) {
+//                contextRepository.delete(context);
+//            }
+//        });
 
-        contextRepository.findAll().forEach(context -> {
-            if (!requestContextIds.contains(context.getId())) {
-                contextRepository.delete(context);
-            }
-        });
-
-// === PROCESAR Y GUARDAR NUEVOS DATOS ===
+        // === PROCESAR Y GUARDAR NUEVOS DATOS ===
         for (DTO.UserPermissionsTreeDTO.ContextDTO ctxDto : request.contexts()) {
             Context context = contextRepository.findById(
                     ctxDto.id() != null ? ctxDto.id() : -1
@@ -233,6 +251,7 @@ public class UserService {
                 user.getEmail(),
                 user.getPhone(),
                 user.getAvatarUrl(),
+                user.getInstagram(),
                 user.isDisabled(),
                 user.getRoles().stream().map(role ->
                         new DTO.RoleResponse(

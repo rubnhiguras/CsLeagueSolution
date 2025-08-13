@@ -15,8 +15,8 @@ export const LoginForm = ({ onLogin, handleRegisterWoToken }) => {
       const token = response.data.token;
       localStorage.setItem('token', token);
       onLogin(token);
-    } catch (err) {
-      setError('Login failed. ' + err);
+    } catch (err) { 
+      setError('Fallo en la autenticación: ' + err.response.data.token);
     }
   };
 

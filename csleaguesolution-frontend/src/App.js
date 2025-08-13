@@ -3,7 +3,7 @@ import logo from './logo_p.svg';
 import './App.css';
 import { LoginForm } from './components/LoginForm';
 import { RegisterForm } from './components/RegisterForm';
-import { UserProfile } from './components/UserProfile';  
+import { UserProfile } from './components/User/UserProfile';  
 import ScrollToTopButton from './components/ScrollToTopButton';
 
 const App = () => {

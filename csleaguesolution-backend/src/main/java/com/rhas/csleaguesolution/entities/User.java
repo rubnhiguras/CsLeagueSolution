@@ -26,6 +26,7 @@ public class User {
     private String email;
     private String passwordHash;
     private String avatarUrl;
+    private String instagram;
     private boolean disabled;
 
     @ManyToMany(fetch = FetchType.LAZY)

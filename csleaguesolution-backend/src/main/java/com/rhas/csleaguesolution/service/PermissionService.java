@@ -38,12 +38,22 @@ public class PermissionService {
         return toDTO(saved);
     }
 
-    public List<DTO.PermissionDTO> search(String query) {
+    public List<DTO.PermissionDTO> searchPermission(String query, String context) {
         return query != null ? permissionRepository.findByNameContainingIgnoreCase(query)
                 .stream()
+                .filter(permission -> permission.getContext().getName().equals(context))
                 .map(this::toDTO)
                 .collect(Collectors.toList()) :
                     List.of()
+                ;
+    }
+
+    public List<DTO.ContextResponse> searchContext(String query) {
+        return query != null ? contextRepository.findByNameContainingIgnoreCase(query)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList()) :
+                List.of()
                 ;
     }
 
@@ -61,6 +71,14 @@ public class PermissionService {
                 p.getDescription(),
                 p.getContext() != null ? p.getContext().getId() : null,
                 p.getContext() != null ? p.getContext().getName() : null
+        );
+    }
+
+    private DTO.ContextResponse toDTO(Context c) {
+        return new DTO.ContextResponse(
+                c.getId(),
+                c.getName(),
+                c.getDescription()
         );
     }
 }

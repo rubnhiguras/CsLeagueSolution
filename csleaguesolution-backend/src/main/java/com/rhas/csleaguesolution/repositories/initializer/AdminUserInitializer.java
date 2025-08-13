@@ -1,5 +1,7 @@
 package com.rhas.csleaguesolution.repositories.initializer;
 
+import com.rhas.csleaguesolution.dto.DTO;
+import com.rhas.csleaguesolution.dto.DTOCsLeague;
 import com.rhas.csleaguesolution.entities.Context;
 import com.rhas.csleaguesolution.repositories.ContextRepository;
 import org.slf4j.Logger;
@@ -40,10 +42,87 @@ public class AdminUserInitializer {
     private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
+    public void initDB(){
+        logger.info("Init base de datos");
+        initContextAdminDb();
+        initContextCSLeagueDb();
+        logger.info("Init base de datos, permisos y roles DONE");
+    }
+
     @Transactional
-    public void initDb() {
+    public void initContextCSLeagueDb(){
+        //TODO: Inicializar contexto de la CSLeague
+        if(contextRepository.findByName(DTOCsLeague.CONTEXT_SYSTEM).isEmpty()) {
+            Context contextCSLeague = contextRepository.save(
+                    Context.builder()
+                            .name(DTOCsLeague.CONTEXT_SYSTEM)
+                            .description("Contexto de administración de la CSLeague")
+                            .build()
+            );
+
+
+            Permission permisoCreateChamps = permisoRepository.save(
+                    Permission.builder()
+                            .name(DTOCsLeague.PERMISSION_CREATE_COMPETITION)
+                            .description("Acceso a la creación de competiciones")
+                            .context(contextCSLeague)
+                            .build()
+            );
+
+            Permission permisoEditChamps = permisoRepository.save(
+                    Permission.builder()
+                            .name(DTOCsLeague.PERMISSION_EDIT_COMPETITION)
+                            .description("Acceso a la modificación de competiciones")
+                            .context(contextCSLeague)
+                            .build()
+            );
+
+            Permission permisoCreateMatch = permisoRepository.save(
+                    Permission.builder()
+                            .name(DTOCsLeague.PERMISSION_CREATE_MATCH)
+                            .description("Acceso a la creación de partidos")
+                            .context(contextCSLeague)
+                            .build()
+            );
+
+            Permission permisoEditMatch = permisoRepository.save(
+                    Permission.builder()
+                            .name(DTOCsLeague.PERMISSION_EDIT_MATCH)
+                            .description("Acceso a la modificación de partidos")
+                            .context(contextCSLeague)
+                            .build()
+            );
+
+            Permission permisoEditMatchStats = permisoRepository.save(
+                    Permission.builder()
+                            .name(DTOCsLeague.PERMISSION_EDIT_MATCH_STATS)
+                            .description("Acceso a las modificaciones de estadísticas de partidos.")
+                            .context(contextCSLeague)
+                            .build()
+            );
+
+            Permission permisoCreationNews = permisoRepository.save(
+                    Permission.builder()
+                            .name(DTOCsLeague.PERMISSION_CREATE_NEWS)
+                            .description("Acceso a la creación de noticias.")
+                            .context(contextCSLeague)
+                            .build()
+            );
+
+            Permission permisoEditNews = permisoRepository.save(
+                    Permission.builder()
+                            .name(DTOCsLeague.PERMISSION_EDIT_NEWS)
+                            .description("Acceso a las modificaciones de noticias.")
+                            .context(contextCSLeague)
+                            .build()
+            );
+        }
+    }
+
+    @Transactional
+    public void initContextAdminDb() {
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
-            logger.info("Init base de datos");
+
 
             Context contextAdmin = contextRepository.save(
                     Context.builder()
@@ -64,6 +143,38 @@ public class AdminUserInitializer {
                     Permission.builder()
                             .name(PERMISSION_USER_ACCESS)
                             .description("Acceso solo a datos propios")
+                            .context(contextAdmin)
+                            .build()
+            );
+
+            Permission permisoRoles = permisoRepository.save(
+                    Permission.builder()
+                            .name(PERMISSION_TREE_ROLES_ACCESS)
+                            .description("Acceso al arbol de permisos y roles de los usuarios")
+                            .context(contextAdmin)
+                            .build()
+            );
+
+            Permission permisoVerUsuarios = permisoRepository.save(
+                    Permission.builder()
+                            .name(PERMISSION_SHOW_USERS_ACCESS)
+                            .description("Acceso los datos de los usuarios")
+                            .context(contextAdmin)
+                            .build()
+            );
+
+            Permission permisoDeshabilitarUsuarios = permisoRepository.save(
+                    Permission.builder()
+                            .name(PERMISSION_DISABLE_USERS_ACCESS)
+                            .description("Acceso a los datos de los usuarios y deshabilitarlos")
+                            .context(contextAdmin)
+                            .build()
+            );
+
+            Permission permisoEditarUsuarios = permisoRepository.save(
+                    Permission.builder()
+                            .name(PERMISSION_EDIT_USERS_ACCESS)
+                            .description("Acceso a la edición de datos de los usuarios")
                             .context(contextAdmin)
                             .build()
             );
@@ -89,7 +200,6 @@ public class AdminUserInitializer {
             admin.addRol(roleAdmin); // relación añadida
             userRepository.save(admin);
 
-            logger.info("Init permisos y roles HECHO");
         }
     }
 }

@@ -19,8 +19,8 @@ export const RegisterForm = ({ onRegister, handleLoginWoToken }) => {
       const token = response.data.token;
       localStorage.setItem('token', token);
       onRegister(token);
-    } catch (err) {
-      setError('Registration failed.');
+    } catch (err) { 
+      setError('Fallo en el registro: ' + err.response.data.token);
     }
   };
 

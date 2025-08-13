@@ -1,46 +1,71 @@
 #!/bin/bash
-set -e
 
-echo "🔄 Reiniciando contenedores con nueva compilación..."
+set -e  # detener el script si falla algo
 
-# Función para detener un contenedor si está corriendo
-stop_container() {
+echo "🔄 Reiniciando contenedores y red..."
+
+# Función para detener y eliminar un contenedor si existe
+clean_container() {
   local container=$1
-  if docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
+  if docker ps -a --format '{{.Names}}' | grep -q "^${container}$"; then
     echo "🛑 Deteniendo contenedor: $container"
     docker stop "$container" > /dev/null
+    echo "🗑️ Eliminando contenedor: $container"
+    docker rm "$container" > /dev/null
   else
-    echo "ℹ️ Contenedor $container no estaba en ejecución."
+    echo "✅ Contenedor $container no existe. Saltando..."
   fi
 }
 
-# Crear red y volumen si no existen
-docker network inspect csleaguesolutionnetwork >/dev/null 2>&1 || docker network create csleaguesolutionnetwork
+# Limpiar contenedores
+clean_container nginx-proxy
+clean_container react-pwa-container
+clean_container springboot-app
+clean_container postgres
+
+# Eliminar red si existe
+if docker network ls --format '{{.Name}}' | grep -q "^csleaguesolutionnetwork$"; then
+  echo "🧹 Eliminando red: csleaguesolutionnetwork"
+  docker network rm csleaguesolutionnetwork > /dev/null
+else
+  echo "✅ Red csleaguesolutionnetwork no existe. Saltando..."
+fi
+
+
+# Crear red personalizada (ignorar si ya existe)
+docker network create csleaguesolutionnetwork || true
+# Crear volumen para datos (ignorar si ya existe)
 docker volume inspect postgres_data >/dev/null 2>&1 || docker volume create postgres_data
 docker volume inspect user_avatars >/dev/null 2>&1 || docker volume create user_avatars
 
-# PostgreSQL
-stop_container postgres
-docker build --pull --no-cache=false -t postgres:16 .
-docker start postgres 2>/dev/null || docker run -d --name postgres --network csleaguesolutionnetwork \
+echo "🔄 Iniciando contenedor PostgreSQL..."
+
+docker run -d --name postgres --network csleaguesolutionnetwork \
   -e POSTGRES_USER=admin \
   -e POSTGRES_PASSWORD=admin123 \
   -e POSTGRES_DB=csleaguesolutiondb \
-  -v postgres_data:/var/lib/postgresql/csleaguesolutiondb/dev/data \
+  -v postgres_data:/var/lib/postgresql/data \
   -p 5432:5432 \
   postgres:16
 
-# Esperar hasta que esté listo
 echo "⏳ Esperando a que PostgreSQL esté listo..."
-until docker exec postgres pg_isready -U admin > /dev/null 2>&1; do
+
+# Esperar activamente usando contenedor temporal
+until docker run --rm --network csleaguesolutionnetwork \
+  postgres:16 pg_isready -h postgres -U admin > /dev/null 2>&1; do
+  echo "❌ PostgreSQL no está listo aún..."
   sleep 1
 done
-echo "✅ PostgreSQL listo."
 
-# Backend
-stop_container springboot-app
+echo "✅ PostgreSQL está listo."
+
+echo " Generando claves de despliegue y encriptación..." 
+
+echo "🔄🚀 Lanzando backend..."
+
 cd ./csleaguesolution-backend
-docker build --no-cache -t usuariocsleaguesolution/csleaguesolution-backend:latest .
+# Ejecutar el contenedor de Spring Boot 
+docker build --no-cache -t csleaguesolution/csleaguesolution-backend:latest .
 docker start springboot-app 2>/dev/null || docker run -d --name springboot-app --network csleaguesolutionnetwork \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/csleaguesolutiondb \
   -e SPRING_DATASOURCE_USERNAME=admin \
@@ -51,25 +76,32 @@ docker start springboot-app 2>/dev/null || docker run -d --name springboot-app -
   -e AVATAR_UPLOAD_DIR=/app/uploads/avatars \
   -p 5005:5005 \
   -v user_avatars:/app/uploads/avatars \
-  usuariocsleaguesolution/csleaguesolution-backend:latest
+  csleaguesolution/csleaguesolution-backend:latest
 cd ..
+echo "✅🚀 Backend levantado correctamente."
+echo "🔄🚀 Lanzando frontend..."
+# Ejecutar el contenedor de front-end
+cd ./csleaguesolution-frontend 
+rm -rf node_modules package-lock.json
+# 1. Limpiar cachés previas
+docker builder prune -f
 
-# Frontend
-stop_container react-pwa-container
-cd ./csleaguesolution-frontend
-docker build --no-cache -t usuariocsleaguesolution/react-pwa-app:latest .
-docker start react-pwa-container 2>/dev/null || docker run -d --name react-pwa-container --network csleaguesolutionnetwork \
-  usuariocsleaguesolution/react-pwa-app:latest
+# 2. Construir con BuildKit habilitado
+docker build --no-cache -t usariocsleaguesolution/react-pwa-app:latest .
+
+# 3. Ejecutar el contenedor
+docker run -d --name react-pwa-container --network csleaguesolutionnetwork usariocsleaguesolution/react-pwa-app:latest
+
+echo "✅🚀 Frontend levantado correctamente."
+
 cd ..
-
-# Reverse proxy
-stop_container nginx-proxy
-docker start nginx-proxy 2>/dev/null || docker run -d --name nginx-proxy \
+echo "🔄🚀 Levantando revers proxy... "
+docker run -d --name nginx-proxy \
   --network csleaguesolutionnetwork \
   -p 80:80 \
   -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
   -v user_avatars:/usr/share/nginx/html/avatars \
   nginx:latest
+echo "✅🚀 Todo levantado correctamente."
 
-echo "✅ Todo levantado correctamente."
 echo "ℹ️ Accede a http://localhost para visualizar la APP. http://localhost/api/swagger-ui/index.html y explorar /api/v3/api-docs para visualizar la API"

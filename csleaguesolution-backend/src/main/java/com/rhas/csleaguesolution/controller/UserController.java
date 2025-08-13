@@ -2,14 +2,18 @@ package com.rhas.csleaguesolution.controller;
 
 import com.rhas.csleaguesolution.dto.DTO;
 import com.rhas.csleaguesolution.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,11 +34,28 @@ public class UserController {
 
     }
 
-
-    @GetMapping("/showCompetitions")
-    public ResponseEntity<DTO.UserResponse> getCompetitions() {
+    @PutMapping("/me")
+    public ResponseEntity<DTO.UserResponse> editCurrentUser(@Valid @RequestBody DTO.UserRequest userRequest) {
         try{
-            return ResponseEntity.ok(userService.getCurrentUser());
+            DTO.UserResponse result = userService.updateCurrentUser(userRequest);
+            return result != null ?
+              ResponseEntity.ok(result) :
+              ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception exception){
+            logger.error(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+
+    @GetMapping("/showAllUsers")
+    public ResponseEntity<List<DTO.UserResponse>> getAllUsers() {
+        try {
+            return ResponseEntity.ok(userService.getAllUsers());
+        } catch (AccessDeniedException exception){
+            logger.error(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception exception){
             logger.error(exception.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

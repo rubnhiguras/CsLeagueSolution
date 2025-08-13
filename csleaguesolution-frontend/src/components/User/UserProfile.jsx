@@ -1,6 +1,6 @@
 // src/components/UserProfile.jsx
 import React, { useEffect, useState } from 'react';
-import './styles.css';
+import '../styles.css';
 import { UserRolesPermissions } from './UserRolesPermissions'; 
 import './UserRolesPermissions.css';
 import axios from 'axios';
@@ -45,6 +45,18 @@ export const UserProfile = ({ onLogout }) => {
   if (error) return <p>{error}</p>;
   if (!user) return <p>Loading...</p>;
 
+const hasFullAccess = user.roles?.some(role =>
+    role.permisos?.some(permiso => permiso.name === "FULL_ACCESS")
+);
+
+const hasUserAccess = user.roles?.some(role =>
+    role.permisos?.some(permiso =>
+        permiso.name === "SHOW_USERS_ACCESS" ||
+        permiso.name === "EDIT_USERS_ACCESS" ||
+        permiso.name === "DISABLE_USERS_ACCESS"
+    )
+);
+
   return (
     <div className="profile-container">
       <div className="sidebar flex flex-row items-center p-6 gap-6 justify-between w-full">
@@ -74,14 +86,16 @@ export const UserProfile = ({ onLogout }) => {
             <FaTrophy size={20} /> 
             <span className="tooltiptext">Competiciones</span>
           </button>
-          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Usuarios')}>
-            <FiUsers size={20} /> 
-            <span className="tooltiptext">Usuarios</span>
-          </button>
           <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Patrocinadores')}>
             <FaHandshake size={20} /> 
             <span className="tooltiptext">Patrocinadores</span>
           </button>
+          {(hasFullAccess || hasUserAccess) && (
+          <button className="sidebar-button tooltip" onClick={() => setSectionSelected('Usuarios')}>
+            <FiUsers size={20} /> 
+            <span className="tooltiptext">Usuarios</span>
+          </button>
+          )}
           <span/>
           <button className="sidebar-button tooltip" onClick={onRefresh}>
             <FiRefreshCw 
@@ -98,6 +112,7 @@ export const UserProfile = ({ onLogout }) => {
       </div>
 
       <div className="profile-info">
+        {sectionSelected === 'Usuarios' ? (hasFullAccess || hasUserAccess) && (<span>ACCESSO USUARIOS</span>) : (<i></i>) }
         {sectionSelected === 'Perfil' ? 
           (
             <UserRolesPermissions user={user} ></UserRolesPermissions>

@@ -28,8 +28,8 @@ public class PermissionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DTO.PermissionDTO>> search(@RequestParam String query) {
-        List<DTO.PermissionDTO> results = permissionService.search(query);
+    public ResponseEntity<List<DTO.PermissionDTO>> search(@RequestParam String query, @RequestParam String context) {
+        List<DTO.PermissionDTO> results = permissionService.searchPermission(query, context);
         return ResponseEntity.ok(results);
     }
 
