@@ -48,6 +48,20 @@ public class UserController {
 
     }
 
+    @PutMapping("/user/{id}")
+    public ResponseEntity<DTO.UserResponse> editCurrentUser(@Valid @RequestBody DTO.UserRequest userRequest, @PathVariable Long id) {
+        try{
+            DTO.UserResponse result = userService.updateUser(userRequest);
+            return result != null ?
+                    ResponseEntity.ok(result) :
+                    ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception exception){
+            logger.error(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
 
     @GetMapping("/showAllUsers")
     public ResponseEntity<List<DTO.UserResponse>> getAllUsers() {

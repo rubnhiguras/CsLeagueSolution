@@ -5,7 +5,8 @@ import './UserRolesPermissions.css';
 import '../styles.css';
 import axios from 'axios';
 
-export const UserRolesPermissions = ({ user }) => {
+export const UserRolesPermissions = ({ user, selectedUser }) => {
+    const [authUser, setAuthUser] = useState({});
     const [expandedContexts, setExpandedContexts] = useState({});
     const [expandedRoles, setExpandedRoles] = useState({});
     const [treeData, setTreeData] = useState(user?.roles || []);
@@ -22,11 +23,25 @@ export const UserRolesPermissions = ({ user }) => {
         phone: user.phone || "",
         instagram: user.instagram,
         disabled: user.disabled || false
-    });
+    }); 
 
     useEffect(() => {
-        fetchContexts();
-    }, []);
+        const fetchUser = async () => {
+          const token = localStorage.getItem('token');
+          try {
+            const response = await axios.get('http://localhost/api/api/users/me', {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            setAuthUser(response.data);
+          } catch (err) {
+            setError('Failed to load user profile.');
+            localStorage.removeItem('token');
+          }
+        };
+        fetchUser();
+      }, []);
 
     const fetchContexts = async (query) => {
         try {
@@ -181,13 +196,21 @@ export const UserRolesPermissions = ({ user }) => {
         try {
             setSaving(true);
             const token = localStorage.getItem('token');
+            if(selectedUser){
+                await axios.put(`http://localhost/api/api/users/user/${user.id}`, userHeader, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                        }
+                });
+            } else {
+                await axios.put("http://localhost/api/api/users/me", userHeader, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
 
-            await axios.put("http://localhost/api/api/users/me", userHeader, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
+            }
+            
             if(hasFullAccess || hasTreeRoleAccess) {
                 const payload = {
                     userId: user.id,
@@ -227,11 +250,11 @@ export const UserRolesPermissions = ({ user }) => {
         onSave(treeData);
     };
 
-    const hasFullAccess = treeData.some(role =>
+    const hasFullAccess = authUser.roles?.some(role =>
         role.permisos?.some(permiso => permiso.name === "FULL_ACCESS")
     );
 
-    const hasTreeRoleAccess = treeData.some(role =>
+    const hasTreeRoleAccess = authUser.roles?.some(role =>
         role.permisos?.some(permiso => permiso.name === "TREE_ROLES_ACCESS")
     );
 

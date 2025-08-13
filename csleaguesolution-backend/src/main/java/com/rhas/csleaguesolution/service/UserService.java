@@ -91,7 +91,8 @@ public class UserService {
         final boolean hasRequiredPermission = getCurrentUserPrincipal()
                 .getAuthorities().stream()
                 .anyMatch(grantedAuthority ->
-                        (DTO.PERMISSION_SHOW_USERS_ACCESS.equals(grantedAuthority.getAuthority()) ||
+                        (DTO.PERMISSION_FULL_ACCESS.equals(grantedAuthority.getAuthority()) ||
+                         DTO.PERMISSION_SHOW_USERS_ACCESS.equals(grantedAuthority.getAuthority()) ||
                          DTO.PERMISSION_EDIT_USERS_ACCESS.equals(grantedAuthority.getAuthority()) ||
                          DTO.PERMISSION_DISABLE_USERS_ACCESS.equals(grantedAuthority.getAuthority())
                         )
@@ -114,6 +115,16 @@ public class UserService {
      * Update user profile
      */
     public DTO.UserResponse updateUser(DTO.UserRequest userRequest) {
+        final boolean hasRequiredPermission = getCurrentUserPrincipal()
+                .getAuthorities().stream()
+                .anyMatch(grantedAuthority ->
+                        (DTO.PERMISSION_FULL_ACCESS.equals(grantedAuthority.getAuthority()) ||
+                         DTO.PERMISSION_EDIT_USERS_ACCESS.equals(grantedAuthority.getAuthority())
+                        )
+                );
+        if(!hasRequiredPermission){
+            throw new AccessDeniedException("Acceso a datos no permitidos");
+        }
         User user = userRepository.findByEmail(userRequest.email())
                 .orElseThrow(() -> new OpenApiResourceNotFoundException(userRequest.email()));
 

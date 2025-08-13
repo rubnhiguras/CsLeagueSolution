@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles.css';
 import { UserRolesPermissions } from './UserRolesPermissions'; 
+import UserListWithModal from './UserListWithModal';
 import './UserRolesPermissions.css';
 import axios from 'axios';
 import { FiLogOut, FiHome, FiUser, FiUsers, FiCalendar, FiRefreshCw } from "react-icons/fi";
@@ -26,6 +27,7 @@ export const UserProfile = ({ onLogout }) => {
       } catch (err) {
         setError('Failed to load user profile.');
         localStorage.removeItem('token');
+        onRefresh();
       }
     };
     fetchUser();
@@ -112,15 +114,17 @@ const hasUserAccess = user.roles?.some(role =>
       </div>
 
       <div className="profile-info">
-        {sectionSelected === 'Usuarios' ? (hasFullAccess || hasUserAccess) && (<span>ACCESSO USUARIOS</span>) : (<i></i>) }
-        {sectionSelected === 'Perfil' ? 
-          (
-            <UserRolesPermissions user={user} ></UserRolesPermissions>
-          ) : 
-          ( 
-            <span>{sectionSelected}</span> 
-          )
-        }
+        {sectionSelected === 'Perfil' && (
+          <UserRolesPermissions user={user} selectedUser={false}/>
+        )}
+        
+        {sectionSelected === 'Usuarios' && (hasFullAccess || hasUserAccess) && (
+          <UserListWithModal />
+        )}
+        
+        {!['Perfil', 'Usuarios'].includes(sectionSelected) && (
+          <span>{sectionSelected}</span> 
+        )}
       </div>
 
     </div>
