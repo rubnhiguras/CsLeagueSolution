@@ -68,7 +68,7 @@ const AvatarUploader = ({user}) => {
       formData.append('file', file);
       
        const response = await axios.post(
-        `http://localhost/api/api/users/${user.id}/avatar`,
+        `/api/api/users/${user.id}/avatar`,
         formData,
         {
           headers: {

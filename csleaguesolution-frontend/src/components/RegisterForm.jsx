@@ -15,7 +15,7 @@ export const RegisterForm = ({ onRegister, handleLoginWoToken }) => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost/api/api/auth/register', { name, surname, phone, email, password });
+      const response = await axios.post('/api/api/auth/register', { name, surname, phone, email, password });
       const token = response.data.token;
       localStorage.setItem('token', token);
       onRegister(token);

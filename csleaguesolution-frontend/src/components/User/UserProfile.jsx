@@ -18,7 +18,7 @@ export const UserProfile = ({ onLogout }) => {
     const fetchUser = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get('http://localhost/api/api/users/me', {
+        const response = await axios.get('/api/api/users/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

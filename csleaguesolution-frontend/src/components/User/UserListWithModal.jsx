@@ -22,7 +22,7 @@ const UserListWithModal = () => {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('http://localhost/api/api/users/showAllUsers', {
+        const response = await fetch('/api/api/users/showAllUsers', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

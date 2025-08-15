@@ -29,7 +29,7 @@ export const UserRolesPermissions = ({ user, selectedUser }) => {
         const fetchUser = async () => {
           const token = localStorage.getItem('token');
           try {
-            const response = await axios.get('http://localhost/api/api/users/me', {
+            const response = await axios.get('/api/api/users/me', {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -46,7 +46,7 @@ export const UserRolesPermissions = ({ user, selectedUser }) => {
     const fetchContexts = async (query) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost/api/api/contexts?query=${query}`, {
+            const response = await axios.get(`/api/api/contexts?query=${query}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAllContexts(response.data);
@@ -58,7 +58,7 @@ export const UserRolesPermissions = ({ user, selectedUser }) => {
     const fetchPermissions = async (query, context) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost/api/api/permissions?query=${query}&context=${context}`, {
+            const response = await axios.get(`/api/api/permissions?query=${query}&context=${context}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAllPermissions(response.data); 
@@ -197,13 +197,13 @@ export const UserRolesPermissions = ({ user, selectedUser }) => {
             setSaving(true);
             const token = localStorage.getItem('token');
             if(selectedUser){
-                await axios.put(`http://localhost/api/api/users/user/${user.id}`, userHeader, {
+                await axios.put(`/api/api/users/user/${user.id}`, userHeader, {
                     headers: {
                         Authorization: `Bearer ${token}`
                         }
                 });
             } else {
-                await axios.put("http://localhost/api/api/users/me", userHeader, {
+                await axios.put("/api/api/users/me", userHeader, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -231,7 +231,7 @@ export const UserRolesPermissions = ({ user, selectedUser }) => {
                     }))
                 };
 
-                await axios.post(`http://localhost/api/api/users/${user.id}/permissions`, payload, {
+                await axios.post(`/api/api/users/${user.id}/permissions`, payload, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
