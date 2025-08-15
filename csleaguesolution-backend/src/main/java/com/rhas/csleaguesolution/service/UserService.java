@@ -56,7 +56,7 @@ public class UserService {
         String originalFilename = file.getOriginalFilename();
         String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String newFilename = UUID.randomUUID().toString() + fileExtension;
-        String relativePath = "http://localhost/api/api/files/avatar/" + newFilename;
+        String relativePath = "/api/api/files/avatar/" + newFilename;
         String absolutePath = avatarUploadDir + File.separator + newFilename;
 
         // Guardar el archivo
